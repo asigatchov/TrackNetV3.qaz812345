@@ -10,6 +10,7 @@ import pandas as pd
 from collections import deque
 from PIL import Image, ImageDraw
 from model import TrackNet, InpaintNet
+from model_fast import TrackNetV3Small, TrackNetV3Nano
 
 # Global variables
 HEIGHT = 288
@@ -17,7 +18,7 @@ WIDTH = 512
 SIGMA = 2.5
 DELTA_T = 1/math.sqrt(HEIGHT**2 + WIDTH**2)
 COOR_TH = DELTA_T * 50
-IMG_FORMAT = 'png'
+IMG_FORMAT = 'jpg'
 
 
 class ResumeArgumentParser():
@@ -61,7 +62,15 @@ def get_model(model_name, seq_len=None, bg_mode=None):
 
         Returns:
             model (torch.nn.Module): Model with specified configuration
+ 
     """
+
+    if model_name == 'InpaintNet':
+        return  InpaintNet()
+
+#if model_name == 'TrackNet':
+    return TrackNetV3Nano(in_dim=(seq_len+1)*3, out_dim=seq_len)
+
 
     if model_name == 'TrackNet':
         if bg_mode == 'subtract':
@@ -270,7 +279,10 @@ def write_pred_video(video_file, pred_dict, save_file, traj_len=8, label_df=None
     cap = cv2.VideoCapture(video_file)
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     w, h = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-    fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
+    #fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
+
+    fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+    #writer = cv2.VideoWriter(output_filename, fourcc, fps,(frame_width, frame_height))
 
     # Read ground truth label if exists
     if label_df is not None:

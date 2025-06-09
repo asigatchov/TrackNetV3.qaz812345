@@ -179,7 +179,8 @@ def train_inpaintnet(model, optimizer, data_loader, param_dict):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', type=str, default='TrackNet', choices=['TrackNet', 'InpaintNet'], help='model type')
+    #parser.add_argument('--model_name', type=str, default='TrackNet', choices=['TrackNet', 'InpaintNet'], help='model type')
+    parser.add_argument('--model_name', type=str, default='TrackNet', help='model type')
     parser.add_argument('--seq_len', type=int, default=8, help='sequence length of input')
     parser.add_argument('--epochs', type=int, default=3, help='number of epochs')
     parser.add_argument('--batch_size', type=int, default=10, help='batch size of training')

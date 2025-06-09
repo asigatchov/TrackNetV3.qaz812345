@@ -57,6 +57,7 @@ scenarios to strengthen the network’s robustness. Given that a shuttlecock can
 
 ## Inference
 * Download the [checkpoints](https://drive.google.com/file/d/1CfzE87a0f6LhBp0kniSl1-89zaLCZ8cA/view?usp=sharing)
+
 * Unzip the file and place the parameter files to ```ckpts```
     ```
     unzip TrackNetV3_ckpts.zip
