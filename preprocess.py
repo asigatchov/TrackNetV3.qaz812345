@@ -40,7 +40,7 @@ for split in ['train', 'test']:
         get_match_median(match_dir)
         print(f'[{split} / match{match_id}]:\ttotal frames: {match_frame_count}')
         split_frame_count += match_frame_count
-    
+
     print(f'[{split}]:\ttotal frames: {split_frame_count}')
 
 # Form validation set
@@ -51,7 +51,7 @@ if not os.path.exists(os.path.join(data_dir, 'val')):
         # Pick last rally in each match as validation set
         video_files = list_dirs(os.path.join(match_dir, 'video'))
         file_format_str = os.path.join('{}', 'train', '{}', 'video','{}.mp4')
-        _, match_dir, rally_id = parse.parse(file_format_str, video_files[-1]) 
+        _, match_dir, rally_id = parse.parse(file_format_str, video_files[-1])
         os.makedirs(os.path.join(data_dir, 'val', match_dir, 'csv'), exist_ok=True)
         os.makedirs(os.path.join(data_dir, 'val', match_dir, 'video'), exist_ok=True)
         shutil.move(os.path.join(data_dir, 'train', match_dir, 'csv', f'{rally_id}_ball.csv'),

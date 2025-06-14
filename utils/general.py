@@ -62,7 +62,7 @@ def get_model(model_name, seq_len=None, bg_mode=None):
 
         Returns:
             model (torch.nn.Module): Model with specified configuration
- 
+
     """
 
     if model_name == 'InpaintNet':
@@ -85,7 +85,7 @@ def get_model(model_name, seq_len=None, bg_mode=None):
         model = InpaintNet()
     else:
         raise ValueError('Invalid model name.')
-    
+
     return model
 
 def show_model_size(model):
@@ -142,7 +142,7 @@ def to_img_format(input, num_ch=1):
     """
 
     assert len(input.shape) == 4, 'Input must be 4D tensor.'
-    
+
     if num_ch == 1:
         # (N, L, H ,W)
         return input
@@ -159,14 +159,14 @@ def to_img_format(input, num_ch=1):
                 img = input[n, :, :, f:f+3]
                 frame = np.concatenate((frame, img.reshape(1, HEIGHT, WIDTH, 3)), axis=0)
             img_seq = np.concatenate((img_seq, frame.reshape(1, seq_len, HEIGHT, WIDTH, 3)), axis=0)
-        
+
         return img_seq
 
 def get_num_frames(rally_dir):
     """ Return the number of frames in the video.
 
         Args:
-            rally_dir (str): File path of the rally frame directory 
+            rally_dir (str): File path of the rally frame directory
                 Format: '{data_dir}/{split}/match{match_id}/frame/{rally_id}'
 
         Returns:
@@ -198,14 +198,14 @@ def get_rally_dirs(data_dir, split):
     match_dirs = os.listdir(os.path.join(data_dir, split))
     match_dirs = [os.path.join(split, d) for d in match_dirs]
     match_dirs = sorted(match_dirs, key=lambda s: int(s.split('match')[-1]))
-    
+
     # Get all rally directories in the match directory
     for match_dir in match_dirs:
         rally_dir = os.listdir(os.path.join(data_dir, match_dir, 'frame'))
         rally_dir = sorted(rally_dir)
         rally_dir = [os.path.join(match_dir, 'frame', d) for d in rally_dir]
         rally_dirs.extend(rally_dir)
-    
+
     return rally_dirs
 
 def generate_frames(video_file):
@@ -230,7 +230,7 @@ def generate_frames(video_file):
         success, frame = cap.read()
         if success:
             frame_list.append(frame)
-            
+
     return frame_list
 
 def draw_traj(img, traj, radius=3, color='red'):
@@ -243,9 +243,9 @@ def draw_traj(img, traj, radius=3, color='red'):
         Returns:
             img (numpy.ndarray): Image with trajectory drawn
     """
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)   
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img)
-    
+
     for i in range(len(traj)):
         if traj[i] is not None:
             draw_x = traj[i][0]
@@ -271,7 +271,7 @@ def write_pred_video(video_file, pred_dict, save_file, traj_len=8, label_df=None
             save_file (str): File path of the output video file
             traj_len (int, optional): Length of trajectory to draw
             label_df (pandas.DataFrame, optional): Ground truth label dataframe
-        
+
         Returns:
             None
     """
@@ -287,18 +287,18 @@ def write_pred_video(video_file, pred_dict, save_file, traj_len=8, label_df=None
     # Read ground truth label if exists
     if label_df is not None:
         f_i, x, y, vis = label_df['Frame'], label_df['X'], label_df['Y'], label_df['Visibility']
-    
+
     # Read prediction result
     x_pred, y_pred, vis_pred = pred_dict['X'], pred_dict['Y'], pred_dict['Visibility']
 
     # Video config
     out = cv2.VideoWriter(save_file, fourcc, fps, (w, h))
-    
+
     # Create a queue for storing trajectory
     pred_queue = deque()
     if label_df is not None:
         gt_queue = deque()
-    
+
     # Draw label and prediction trajectory
     #for i, frame in enumerate(frame_list):
     i = 0
@@ -306,13 +306,13 @@ def write_pred_video(video_file, pred_dict, save_file, traj_len=8, label_df=None
         success, frame = cap.read()
         if not success:
             break
-        
+
         # Check capacity of queue
         if len(pred_queue) >= traj_len:
             pred_queue.pop()
         if label_df is not None and len(gt_queue) >= traj_len:
             gt_queue.pop()
-        
+
         # Push ball coordinates for each frame
         if label_df is not None:
             gt_queue.appendleft([x[i], y[i]]) if vis[i] and i < len(label_df) else gt_queue.appendleft(None)
@@ -321,7 +321,7 @@ def write_pred_video(video_file, pred_dict, save_file, traj_len=8, label_df=None
         # Draw ground truth trajectory if exists
         if label_df is not None:
             frame = draw_traj(frame, gt_queue, color='red')
-        
+
         # Draw prediction trajectory
         frame = draw_traj(frame, pred_queue, color='yellow')
 
@@ -355,7 +355,7 @@ def write_pred_csv(pred_dict, save_file, save_inpaint_mask=False):
                                 'X_GT': pred_dict['X_GT'],
                                 'Y_GT': pred_dict['Y_GT'],
                                 'Visibility': pred_dict['Visibility'],
-                                'X': pred_dict['X'], 
+                                'X': pred_dict['X'],
                                 'Y': pred_dict['Y'],
                                 'Inpaint_Mask': pred_dict['Inpaint_Mask']})
     else:
@@ -364,13 +364,13 @@ def write_pred_csv(pred_dict, save_file, save_inpaint_mask=False):
                                 'X': pred_dict['X'],
                                 'Y': pred_dict['Y']})
     pred_df.to_csv(save_file, index=False)
-    
+
 def convert_gt_to_coco_json(data_dir, split, drop=False):
     """ Convert ground truth csv file to coco format json file.
 
         Args:
             split (str): Split name
-        
+
         Returns:
             None
     """
@@ -418,7 +418,7 @@ def convert_gt_to_coco_json(data_dir, split, drop=False):
     }
     with open(f'{data_dir}/coco_format_gt.json', 'w') as f:
         json.dump(coco_data, f)
-    
+
 ################################ Preprocessing Functions ################################
 def generate_data_frames(video_file):
     """ Sample frames from the videos in the dataset.
@@ -426,10 +426,10 @@ def generate_data_frames(video_file):
         Args:
             video_file (str): File path of video in dataset
                 Format: '{data_dir}/{split}/match{match_id}/video/{rally_id}.mp4'
-        
+
         Returns:
             None
-        
+
         Actions:
             Generate frames from the video and save as image files to the corresponding frame directory
     """
@@ -471,7 +471,7 @@ def generate_data_frames(video_file):
         if success:
             frames.append(frame)
             cv2.imwrite(os.path.join(rally_dir, f'{len(frames)-1}.{IMG_FORMAT}'), frame)
-    
+
     # Calculate the median of all frames
     median = np.median(np.array(frames), 0)
     median = median[..., ::-1] # BGR to RGB
@@ -483,7 +483,7 @@ def get_match_median(match_dir):
         Args:
             match_dir (str): File path of match directory
                 Format: '{data_dir}/{split}/match{match_id}'
-            
+
         Returns:
             None
     """
@@ -501,7 +501,7 @@ def get_match_median(match_dir):
             get_rally_median(os.path.join(match_dir, 'video', f'{rally_id}.mp4'))
         frame = np.load(os.path.join(rally_dir, 'median.npz'))['median']
         medians.append(frame)
-    
+
     # Calculate the median of all rally medians
     median = np.median(np.array(medians), 0)
     np.savez(os.path.join(match_dir, 'median.npz'), median=median) # Must be lossless, do not save as image format
@@ -512,18 +512,18 @@ def get_rally_median(video_file):
         Args:
             video_file (str): File path of video file
                 Format: '{data_dir}/{split}/match{match_id}/video/{rally_id}.mp4'
-        
+
         Returns:
             None
     """
-    
+
     frames = []
 
     # Get corresponding rally directory
     file_format_str = os.path.join('{}', 'video', '{}.mp4')
     match_dir, rally_id = parse.parse(file_format_str, video_file)
     save_dir = os.path.join(match_dir, 'frame', rally_id)
-    
+
     # Sample frames from the video
     cap = cv2.VideoCapture(video_file)
     success = True
@@ -531,7 +531,7 @@ def get_rally_median(video_file):
         success, frame = cap.read()
         if success:
             frames.append(frame)
-    
+
     # Calculate the median of all frames
     median = np.median(np.array(frames), 0)[..., ::-1] # BGR to RGB
     np.savez(os.path.join(save_dir, 'median.npz'), median=median) # Must be lossless, do not save as image format
