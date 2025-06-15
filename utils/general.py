@@ -69,7 +69,11 @@ def get_model(model_name, seq_len=None, bg_mode=None):
         return  InpaintNet()
 
 #if model_name == 'TrackNet':
-    return TrackNetV3Nano(in_dim=(seq_len+1)*3, out_dim=seq_len)
+
+    if bg_mode == 'concat':
+        return TrackNetV3Nano(in_dim=(seq_len+1)*3, out_dim=seq_len)
+
+    return TrackNetV3Nano(in_dim=seq_len*3, out_dim=seq_len)
 
 
     if model_name == 'TrackNet':

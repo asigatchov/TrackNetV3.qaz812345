@@ -1,19 +1,36 @@
 import torch
 import torch.nn as nn
 
+# class Conv2DBlock(nn.Module):
+#     """ Conv2D + BN + ReLU """
+#     def __init__(self, in_dim, out_dim, **kwargs):
+#         super(Conv2DBlock, self).__init__(**kwargs)
+#         self.conv = nn.Conv2d(in_dim, out_dim, kernel_size=3, padding='same', bias=False)
+#         self.bn = nn.BatchNorm2d(out_dim)
+#         self.relu = nn.ReLU()
+
+#     def forward(self, x):
+#         x = self.conv(x)
+#         x = self.bn(x)
+#         x = self.relu(x)
+#         return x
+
+
 class Conv2DBlock(nn.Module):
-    """ Conv2D + BN + ReLU """
     def __init__(self, in_dim, out_dim, **kwargs):
         super(Conv2DBlock, self).__init__(**kwargs)
-        self.conv = nn.Conv2d(in_dim, out_dim, kernel_size=3, padding='same', bias=False)
+        self.conv = nn.Conv2d(
+            in_dim, out_dim, kernel_size=3, padding=1, bias=False
+        )  # padding=1 for 3x3 kernel
         self.bn = nn.BatchNorm2d(out_dim)
         self.relu = nn.ReLU()
-    
+
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
         x = self.relu(x)
         return x
+
 
 class Double2DConv(nn.Module):
     """ Conv2DBlock x 2 """
@@ -26,7 +43,7 @@ class Double2DConv(nn.Module):
         x = self.conv_1(x)
         x = self.conv_2(x)
         return x
-    
+
 class Triple2DConv(nn.Module):
     """ Conv2DBlock x 3 """
     def __init__(self, in_dim, out_dim):

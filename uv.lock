@@ -836,6 +836,29 @@ wheels = [
 ]
 
 [[package]]
+name = "onnx"
+version = "1.12.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "protobuf" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2c/6a/39b0580858589a67c3322aabc2634f158391ffbf98fa410127533e7f1495/onnx-1.12.0.tar.gz", hash = "sha256:13b3e77d27523b9dbf4f30dfc9c959455859d5e34e921c44f712d69b8369eff9", size = 10112442 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/15/57cd390fa0a8cb548dad706231c36a94af5f51868a53eafe784a924d74b3/onnx-1.12.0-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:bdbd2578424c70836f4d0f9dda16c21868ddb07cc8192f9e8a176908b43d694b", size = 12389779 },
+    { url = "https://files.pythonhosted.org/packages/2c/cf/48a81c01be51553ef5092de20200e911409974f71beacafbb03d6a80b1e0/onnx-1.12.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:213e73610173f6b2e99f99a4b0636f80b379c417312079d603806e48ada4ca8b", size = 12971392 },
+    { url = "https://files.pythonhosted.org/packages/53/b7/0a595a49bd5bc9af85498cd336f98cd1eaf4783f6eeed03908b12c5d11a4/onnx-1.12.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9fd2f4e23078df197bb76a59b9cd8f5a43a6ad2edc035edb3ecfb9042093e05a", size = 13109991 },
+    { url = "https://files.pythonhosted.org/packages/de/4c/ef1f2cc02dd2aa5a2542fd8bebdeb2ac7751b2ea9944ecb1a7e311a5c8b6/onnx-1.12.0-cp310-cp310-win32.whl", hash = "sha256:23781594bb8b7ee985de1005b3c601648d5b0568a81e01365c48f91d1f5648e4", size = 11384583 },
+    { url = "https://files.pythonhosted.org/packages/b0/f0/5e383f64293857e86c300cb70010cce1ca6f038f1563b85501d30404ad2a/onnx-1.12.0-cp310-cp310-win_amd64.whl", hash = "sha256:81a3555fd67be2518bf86096299b48fb9154652596219890abfe90bd43a9ec13", size = 11466895 },
+    { url = "https://files.pythonhosted.org/packages/30/7a/82cf5e724f4bdbe3afbeeb3b187513cc813653dacc4943758b97ab3ac503/onnx-1.12.0-cp39-cp39-macosx_10_12_x86_64.whl", hash = "sha256:c39a7a0352c856f1df30dccf527eb6cb4909052e5eaf6fa2772a637324c526aa", size = 12389937 },
+    { url = "https://files.pythonhosted.org/packages/e6/6b/396e2524d00c9469faff22d7590b62df2e464781d372fb46b22c9441db85/onnx-1.12.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:fab13feb4d94342aae6d357d480f2e47d41b9f4e584367542b21ca6defda9e0a", size = 12971710 },
+    { url = "https://files.pythonhosted.org/packages/f8/4a/b7e053cb236d76e129a98c3b2a85a2acbae4776f37be3d41bbca403280bf/onnx-1.12.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c7a9b3ea02c30efc1d2662337e280266aca491a8e86be0d8a657f874b7cccd1e", size = 13110337 },
+    { url = "https://files.pythonhosted.org/packages/82/4d/1db8ef0137bdfeafeff1e99d34ebf3290b36103441f6f2d2ea58f346ae4a/onnx-1.12.0-cp39-cp39-win32.whl", hash = "sha256:f8800f28c746ab06e51ef8449fd1215621f4ddba91be3ffc264658937d38a2af", size = 11384623 },
+    { url = "https://files.pythonhosted.org/packages/5f/65/4f72306146aa19e462f400ea28e8cf393437bcd98caccf1d4d01278aa727/onnx-1.12.0-cp39-cp39-win_amd64.whl", hash = "sha256:af90427ca04c6b7b8107c2021e1273227a3ef1a7a01f3073039cae7855a59833", size = 11466903 },
+]
+
+[[package]]
 name = "opencv-python"
 version = "4.7.0.72"
 source = { registry = "https://pypi.org/simple" }
@@ -1344,6 +1367,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "matplotlib" },
     { name = "numpy" },
+    { name = "onnx" },
     { name = "opencv-python", version = "4.7.0.72", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "opencv-python", version = "4.11.0.86", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "pandas" },
@@ -1357,6 +1381,7 @@ dependencies = [
 requires-dist = [
     { name = "matplotlib", specifier = ">=3.8.4" },
     { name = "numpy", specifier = "==1.22.4" },
+    { name = "onnx", specifier = ">=1.12.0" },
     { name = "opencv-python", specifier = ">=4.7.0.72" },
     { name = "pandas", specifier = ">=1.5.1" },
     { name = "parse", specifier = ">=1.20.2" },
