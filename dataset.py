@@ -229,7 +229,7 @@ class Shuttlecock_Trajectory_Dataset(Dataset):
             label_df = pd.read_csv(csv_file, encoding='utf8').sort_values(by='Frame').fillna(0)
 
             f_file = np.array([os.path.join(rally_dir, f'{f_id}.{IMG_FORMAT}') for f_id in label_df['Frame']])
-            #import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
             x, y, v = np.array(label_df['X']), np.array(label_df['Y']), np.array(label_df['Visibility'])
 
             id = np.array([], dtype=np.int32).reshape(0, self.seq_len, 2)
@@ -433,26 +433,6 @@ class Shuttlecock_Trajectory_Dataset(Dataset):
                 median_img = self.median
 
             # Process the frame sequence
-            frames = np.array([]).reshape(0, self.HEIGHT, self.WIDTH)
-            # for i in range(self.seq_len):
-            #     img = Image.fromarray(imgs[i])
-            #     if self.bg_mode == 'subtract':
-            #         img = Image.fromarray(np.sum(np.absolute(img - median_img), 2).astype('uint8'))
-            #         img = np.array(img.resize(size=(self.WIDTH, self.HEIGHT)))
-            #         img = img.reshape(1, self.HEIGHT, self.WIDTH)
-            #     elif self.bg_mode == 'subtract_concat':
-            #         diff_img = Image.fromarray(np.sum(np.absolute(img - median_img), 2).astype('uint8'))
-            #         diff_img = np.array(diff_img.resize(size=(self.WIDTH, self.HEIGHT)))
-            #         diff_img = diff_img.reshape(1, self.HEIGHT, self.WIDTH)
-            #         img = np.array(img.resize(size=(self.WIDTH, self.HEIGHT)))
-            #         img = np.moveaxis(img, -1, 0)
-            #         img = np.concatenate((img, diff_img), axis=0)
-            #     else:
-            #         img = np.array(img.resize(size=(self.WIDTH, self.HEIGHT)))
-            #         img = np.moveaxis(img, -1, 0)
-
-            #     frames = np.concatenate((frames, img), axis=0)
-
 
             frames = np.array([]).reshape(0, self.HEIGHT, self.WIDTH)
             for i in range(self.seq_len):
@@ -619,6 +599,7 @@ class Shuttlecock_Trajectory_Dataset(Dataset):
                 frame_file = self.data_dict['frame_file'][idx]
                 coor = self.data_dict['coor'][idx]
                 vis = self.data_dict['vis'][idx]
+                # print(f"idx: {idx}, data_idx: {data_idx}, frame_file: {frame_file}, coor: {coor}, vis: {vis}", data_idx)
                 w, h = self.img_config['img_shape'][data_idx[0][0]]
                 w_scaler, h_scaler = self.img_config['img_scaler'][data_idx[0][0]]
 
@@ -692,7 +673,7 @@ class Video_IterableDataset(IterableDataset):
     """ Dataset for inference especially for large video. """
     def __init__(self,
         video_file,
-        seq_len=8,
+        seq_len=4,
         sliding_step=1,
         bg_mode='',
         HEIGHT=HEIGHT,

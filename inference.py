@@ -84,10 +84,13 @@ def initialize_model(model_path: str) -> Tuple[Optional[torch.nn.Module], int, s
     """
     try:
         tracknet_ckpt = torch.load(model_path)
+
         seq_len = tracknet_ckpt["param_dict"]["seq_len"]
         bg_mode = tracknet_ckpt["param_dict"]["bg_mode"]
+        #sbg_mode = None if not bg_mode
         print(f"Checkpoint: seq_len={seq_len}, bg_mode={bg_mode}")
         model = get_model("TrackNet", seq_len, bg_mode).cuda()
+        #print("model:",tracknet_ckpt["model"])
         model.load_state_dict(tracknet_ckpt["model"])
         model.eval()
         return model, seq_len, bg_mode
@@ -172,6 +175,7 @@ def process_frame(
         x = x.view(1, -1, HEIGHT, WIDTH)  # (1, C * seq_len, H, W)
         if bg_mode == "concat" and background_tensor is not None:
             x = torch.cat([background_tensor.unsqueeze(0), x], dim=1)
+
         #print(f"Input shape to model: {x.shape}")
         with torch.no_grad():
             y_pred = tracknet(x).detach().cpu()
@@ -362,12 +366,12 @@ def main():
             write_csv_incrementally(csv_writer, csv_file, [t, vis, cx, cy], t)
 
         # Display frame
-        # display_frame_result = display_frame(frame, pred_history, traj_len)
-        # if video_writer:
-        #     video_writer.write(display_frame_result)
-        # cv2.imshow("Prediction", display_frame_result)
-        # if cv2.waitKey(1) & 0xFF == ord("q"):
-        #     break
+        display_frame_result = display_frame(frame, pred_history, traj_len)
+        if video_writer:
+            video_writer.write(display_frame_result)
+        cv2.imshow("Prediction", display_frame_result)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
 
         # Report FPS
         last_report_time = report_fps(start_time, t + 1, last_report_time)

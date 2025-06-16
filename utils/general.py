@@ -11,6 +11,7 @@ from collections import deque
 from PIL import Image, ImageDraw
 from model import TrackNet, InpaintNet
 from model_fast import TrackNetV3Small, TrackNetV3Nano
+from model_ultrafast import TrackNetV3NanoOptimized
 
 # Global variables
 HEIGHT = 288
@@ -68,13 +69,13 @@ def get_model(model_name, seq_len=None, bg_mode=None):
     if model_name == 'InpaintNet':
         return  InpaintNet()
 
-#if model_name == 'TrackNet':
+    # if model_name == 'TrackNet':
 
     if bg_mode == 'concat':
-        return TrackNetV3Nano(in_dim=(seq_len+1)*3, out_dim=seq_len)
+        return TrackNetV3Nano(in_dim=(seq_len + 1) * 3, out_dim=seq_len)
 
-    return TrackNetV3Nano(in_dim=seq_len*3, out_dim=seq_len)
-
+    return TrackNetV3Nano(in_dim=seq_len * 3, out_dim=seq_len)
+    return TrackNetV3NanoOptimized(in_dim=seq_len * 3, out_dim=seq_len)
 
     if model_name == 'TrackNet':
         if bg_mode == 'subtract':
