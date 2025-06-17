@@ -74,8 +74,10 @@ def get_model(model_name, seq_len=None, bg_mode=None):
     if bg_mode == 'concat':
         return TrackNetV3Nano(in_dim=(seq_len + 1) * 3, out_dim=seq_len)
 
-    return TrackNetV3Nano(in_dim=seq_len * 3, out_dim=seq_len)
+    #if model_name == 'TrackNetV3NanoOptimized':
     return TrackNetV3NanoOptimized(in_dim=seq_len * 3, out_dim=seq_len)
+
+    return TrackNetV3Nano(in_dim=seq_len * 3, out_dim=seq_len)
 
     if model_name == 'TrackNet':
         if bg_mode == 'subtract':

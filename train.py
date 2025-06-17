@@ -18,7 +18,7 @@ from utils.visualize import plot_heatmap_pred_sample, plot_traj_pred_sample, wri
 
 def mixup(x, y, alpha=0.5):
     """Returns mixed inputs, pairs of targets.
-    
+
         Args:
             x (torch.Tensor): Input tensor
             y (torch.Tensor): Target tensor
@@ -42,7 +42,7 @@ def mixup(x, y, alpha=0.5):
 def get_random_mask(mask_size, mask_ratio):
     """ Generate random mask by binomial distribution.
         1 means masked, 0 means not.
-    
+
         Args:
             mask_size (Tuple[int, int]): Mask size (N, L)
             mask_ratio (float): Ratio of masked area
@@ -68,7 +68,7 @@ def train_tracknet(model, optimizer, data_loader, param_dict):
                 - param_dict['verbose'] (bool): Control whether to show progress bar
                 - param_dict['bg_mode'] (str): For visualizing current prediction
                 - param_dict['save_dir'] (str): For saving current prediction
-        
+
         Returns:
             (float): Average loss
     """
@@ -80,7 +80,7 @@ def train_tracknet(model, optimizer, data_loader, param_dict):
         data_prob = tqdm(train_loader)
     else:
         data_prob = data_loader
-    
+
     for step, (_, x, y, c, _) in enumerate(data_prob):
         optimizer.zero_grad()
         x, y = x.float().cuda(), y.float().cuda()
@@ -88,7 +88,7 @@ def train_tracknet(model, optimizer, data_loader, param_dict):
         # Sample mixup
         if param_dict['alpha'] > 0:
             x, y = mixup(x, y, param_dict['alpha'])
-        
+
         y_pred = model(x)
         loss = WBCELoss(y_pred, y)
         epoch_loss.append(loss.item())
@@ -103,7 +103,7 @@ def train_tracknet(model, optimizer, data_loader, param_dict):
         if (step + 1) % display_step == 0:
             x, y, y_pred = x.detach().cpu().numpy(), y.detach().cpu().numpy(), y_pred.detach().cpu().numpy()
             c = c.numpy()
-            
+
             # Transform inputs to image format (N, L, H , W, C)
             if param_dict['bg_mode'] == 'subtract':
                 x = to_img_format(x)
@@ -117,9 +117,9 @@ def train_tracknet(model, optimizer, data_loader, param_dict):
             y = to_img_format(y)
             y_pred = to_img_format(y_pred)
             plot_heatmap_pred_sample(x[0], y[0], y_pred[0], c[0], bg_mode=param_dict['bg_mode'], save_dir=param_dict['save_dir'])
-    
+
     return float(np.mean(epoch_loss))
-   
+
 def train_inpaintnet(model, optimizer, data_loader, param_dict):
     """ Train InpaintNet model for one epoch.
 
@@ -151,7 +151,7 @@ def train_inpaintnet(model, optimizer, data_loader, param_dict):
         # Sample random mask as inpainting mask
         mask = get_random_mask(mask_size=coor_gt.shape[:2], mask_ratio=param_dict['mask_ratio']).cuda() # (N, L, 1)
         inpaint_mask = torch.logical_and(vis_gt, mask).int() # visible and masked area
-        
+
         coor_pred = coor_pred * (1 - inpaint_mask) # masked area is set to 0
         refine_coor = model(coor_pred, inpaint_mask)
 
@@ -164,7 +164,7 @@ def train_inpaintnet(model, optimizer, data_loader, param_dict):
         loss.backward()
         nn.utils.clip_grad_norm_(model.parameters(), 1)
         optimizer.step()
-        
+
         if param_dict['verbose'] and (step + 1) % display_step == 0:
             data_prob.set_description(f'Training')
             data_prob.set_postfix(loss=loss.item())
@@ -173,13 +173,13 @@ def train_inpaintnet(model, optimizer, data_loader, param_dict):
         if (step + 1) % display_step == 0:
             coor_gt, refine_coor, inpaint_mask = coor_gt.detach().cpu().numpy(), refine_coor.detach().cpu().numpy(), inpaint_mask.detach().cpu().numpy()
             plot_traj_pred_sample(coor_gt[0], refine_coor[0], inpaint_mask[0], save_dir=param_dict['save_dir'])
-    
+
     return float(np.mean(epoch_loss))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    #parser.add_argument('--model_name', type=str, default='TrackNet', choices=['TrackNet', 'InpaintNet'], help='model type')
+    # parser.add_argument('--model_name', type=str, default='TrackNet', choices=['TrackNet', 'InpaintNet'], help='model type')
     parser.add_argument('--model_name', type=str, default='TrackNet', help='model type')
     parser.add_argument('--seq_len', type=int, default=8, help='sequence length of input')
     parser.add_argument('--epochs', type=int, default=3, help='number of epochs')
@@ -207,13 +207,13 @@ if __name__ == '__main__':
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
-    
+
     print(f"TensorBoard: start with 'tensorboard --logdir {os.path.join(args.save_dir, 'logs')}', view at http://localhost:6006/")
     tb_writer = SummaryWriter(os.path.join(args.save_dir, 'logs'))
 
     display_step = 4 if args.debug else 100
     num_workers = args.batch_size if args.batch_size <= 16 else 16
-    
+
     # Load checkpoint
     if args.resume_training:
         print(f'Load checkpoint from {args.model_name}_cur.pt...')
@@ -223,6 +223,8 @@ if __name__ == '__main__':
         ckpt['param_dict']['resume_training'] = args.resume_training
         ckpt['param_dict']['epochs'] = args.epochs
         ckpt['param_dict']['verbose'] = args.verbose
+#        ckpt["param_dict"]['model_name'] = args.model_name
+
         args = ResumeArgumentParser(ckpt['param_dict'])
 
     print(f'Parameters: {param_dict}')
@@ -266,7 +268,6 @@ if __name__ == '__main__':
     else:
         max_val_acc = 0.
         start_epoch = 0
-        
 
     print(f'Start training...')
     train_start_time = time.time()
@@ -279,7 +280,7 @@ if __name__ == '__main__':
 
         if args.lr_scheduler:
             scheduler.step()
-        
+
         # Pick best model
         cur_val_acc = val_res['accuracy'] if args.model_name == 'TrackNet' else val_res['inpaint']['accuracy']
         if cur_val_acc >= max_val_acc:
@@ -291,7 +292,7 @@ if __name__ == '__main__':
                             scheduler=scheduler.state_dict() if scheduler is not None else None,
                             param_dict=param_dict),
                         os.path.join(args.save_dir, f'{args.model_name}_best.pt'))
-        
+
         # Save current model
         torch.save(dict(epoch=epoch,
                         max_val_acc=max_val_acc,
@@ -300,9 +301,9 @@ if __name__ == '__main__':
                         scheduler=scheduler.state_dict() if scheduler is not None else None,
                         param_dict=param_dict),
                     os.path.join(args.save_dir, f'{args.model_name}_cur.pt'))
-        
+
         print(f'Epoch runtime: {(time.time() - start_time) / 3600.:.2f} hrs')
-    
+
     tb_writer.close()
     print(f'Training time: {(time.time() - train_start_time) / 3600.:.2f} hrs')
     print('Done......')
